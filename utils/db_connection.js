@@ -26,10 +26,10 @@ const local_connection = new Pool
 function joystick_client() {
     joystick_connection.connect((err, client) => {
         if (err) {
-            console_log(`Error connecting to {${process.env.JOYSTICK_HOST}}`);
+            console_log(`Free To Play : Error connecting to {${process.env.JOYSTICK_HOST}}`);
             setTimeout(joystick_client, 60000);
         } else {
-            console_log(`Successfully connected to {${process.env.JOYSTICK_HOST}}`);
+            console_log(`Free To Play : Successfully connected to {${process.env.JOYSTICK_HOST}}`);
         }
     });
 }
@@ -37,22 +37,22 @@ function joystick_client() {
 function local_client() {
     local_connection.connect((err, client) => {
         if (err) {
-            console_log(`Error connecting to {${process.env.LOCAL_HOST}}`);
+            console_log(`Free To Play : Error connecting to {${process.env.LOCAL_HOST}}`);
             setTimeout(local_client, 60000);
         } else {
-            console_log(`Successfully connected to {${process.env.LOCAL_HOST}}`);
+            console_log(`Free To Play : Successfully connected to {${process.env.LOCAL_HOST}}`);
         }
     });
 }
 
 
 joystick_connection.on('error', (err) => {
-    console_log('Joystick Database error',err);
+    console_log('Free To Play : Joystick Database error',err);
     setTimeout(joystick_client, 60000);
 });
 
 local_connection.on('error', (err) => {
-    console_log('Local connection error',err);
+    console_log('Free To Play : Local connection error',err);
     setTimeout(local_client, 60000);
 });
 

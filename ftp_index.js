@@ -14,6 +14,6 @@ app.listen(`${process.env.PORT}`, () => {
 });
 
 app.get('/', (request, response) => {
-  response.json({ info: 'Communication Middleware API' })
+  response.json({ info: 'Free To Play Sending API' })
 })  
  
