@@ -43,8 +43,8 @@ let verificationAttempts = 1;
                                         console_log(`sendEmail[Error]: ${err.message}`);
                                     }
                                 });
-                                console.log('Account has been locked');
-                            } if (obj.subject == 'Email Verification') {
+                                console_log('Account has been locked');
+                            } else if (obj.subject == 'Email Verification') {
                                 local_connection.query(`update ftp_email set is_verified=1,triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
@@ -56,7 +56,20 @@ let verificationAttempts = 1;
                                         console_log(`sendEmail[Error]: ${err.message}`);
                                     }
                                 });
-                                console.log('Email Verification');
+                                console_log('Email Verification');
+                            } else if (obj.subject == 'Password Reset') {
+                                local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
+                                    sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
+                                        .then(function (response) {
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', JSON.stringify(response.data));
+                                        }).catch(function (error) {
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', JSON.stringify(error.data));
+                                        });
+                                    if (err) {
+                                        console_log(`sendEmail[Error]: ${err.message}`);
+                                    }
+                                });
+                                console_log('Password Reset');
                             } else {
                                 await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                     .then(async function (response) {
@@ -162,12 +175,12 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
                 let sendEmailResponse = '';
                 switch (verificationAttempts) {
                     case 1: //1st attempt
-                        sendEmailResponse = await sendEmail(from, email, '2nd Day Email Verification', 'F2PLCHJP 3DVE', fromName, merge_data)
+                        sendEmailResponse = await sendEmail(from, email, '2nd Day Email Verification', 'F2PLCHJP 2DVE', fromName, merge_data)
                             .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', JSON.stringify(response.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'success', JSON.stringify(response.data));
                                 return response;
                             }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'failed', JSON.stringify(error.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'failed', JSON.stringify(error.data));
                                 return error;
                             });
                         break;
@@ -182,12 +195,12 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
                             });
                         break;
                     case 3: //3rd attempt
-                        sendEmailResponse = await sendEmail(from, email, '4th Day Email Verification', 'F2PLCHJP 3DVE', fromName, merge_data)
+                        sendEmailResponse = await sendEmail(from, email, '4th Day Email Verification', 'F2PLCHJP 4DVE', fromName, merge_data)
                             .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', JSON.stringify(response.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', JSON.stringify(response.data));
                                 return response;
                             }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'failed', JSON.stringify(error.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'failed', JSON.stringify(error.data));
                                 return error;
                             });
                         break;
