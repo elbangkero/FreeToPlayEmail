@@ -31,7 +31,7 @@ let verificationAttempts = 1;
                             const obj = JSON.parse(utf8encoded);
 
                             const merge_data = obj.merge ? obj.merge : '';
-                            if (obj.subject == 'Account has been locked') {
+                            if (merge_data.merge_type == 'f2p_lock_email') {
                                 local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
@@ -44,7 +44,7 @@ let verificationAttempts = 1;
                                     }
                                 });
                                 console_log('Account has been locked');
-                            } else if (obj.subject == 'Email Verification') {
+                            } else if (merge_data.merge_type == 'f2p_verify_email') {
                                 local_connection.query(`update ftp_email set is_verified=1,triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
@@ -57,7 +57,7 @@ let verificationAttempts = 1;
                                     }
                                 });
                                 console_log('Email Verification');
-                            } else if (obj.subject == 'Password Reset') {
+                            } else if (merge_data.merge_type == 'f2p_reset_password') {
                                 local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
