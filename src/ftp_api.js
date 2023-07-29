@@ -258,6 +258,28 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
 
 }
 
+//Check if email address is valid for sending
+async function verifyEmailAddress(email) {
+    const apikey = '221C1EB2AFB8520D29510B9E613BB221FF41FD6BF85DF421D34F3D5641C0F88550474E614BC00BBCF4E48AFC1CD306C2'
+    let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `https://api.elasticemail.com/v2/email/verify?email=${email}&apikey=${apikey}`,
+        headers: {}
+    };
+
+    axios.request(config)
+        .then(function (response) {
+            if (response.data.success)
+                resolve(response)
+            else
+                reject(response);
+        })
+        .catch(function (error) {
+            reject(error);
+        });
+
+}
 
 
 
