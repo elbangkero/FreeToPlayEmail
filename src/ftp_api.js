@@ -97,7 +97,7 @@ let verificationAttempts = 1;
 
                                     }).catch(function (error) {
                                         //console.log(error);
-                                        console_log(`Status : ${obj.token} Failed, ` + `Campaign : FreeToPlay Email}`);
+                                        console_log(`Status : ${obj.token} Failed, ` + `Campaign : FreeToPlay Email`);
                                         StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', JSON.stringify(error.data));
                                     }).finally(async function () {
                                         local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, (err, res) => {
@@ -260,25 +260,30 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
 
 //Check if email address is valid for sending
 async function verifyEmailAddress(email) {
-    const apikey = '221C1EB2AFB8520D29510B9E613BB221FF41FD6BF85DF421D34F3D5641C0F88550474E614BC00BBCF4E48AFC1CD306C2'
-    let config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: `https://api.elasticemail.com/v2/email/verify?email=${email}&apikey=${apikey}`,
-        headers: {}
-    };
 
-    axios.request(config)
-        .then(function (response) {
-            if (response.data.success)
-                resolve(response)
-            else
+    return new Promise(async (resolve, reject) => {
+        const apikey = '221C1EB2AFB8520D29510B9E613BB221FF41FD6BF85DF421D34F3D5641C0F88550474E614BC00BBCF4E48AFC1CD306C2'
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `https://api.elasticemail.com/v2/email/verify?email=${email}&apikey=${apikey}`,
+            headers: {}
+        };
+
+        axios.request(config)
+            .then(function (response) {
+                if (response.data.success)
+                    //console.log(response.data);
+                    resolve(response)
+                else
+                    //console.log(response.data);
+                    reject(response);
+            })
+            .catch(function (error) {
+                //console.log(error);
                 reject(response);
-        })
-        .catch(function (error) {
-            reject(error);
-        });
-
+            });
+    });
 }
 
 
@@ -286,7 +291,14 @@ async function verifyEmailAddress(email) {
 
 async function sendEmail(from, email, subject, template_id, fromName, merge_data) {
 
+    await verifyEmailAddress(email)
+        .then(function (response) {
+            console.log('success  na', response.data);
+        }).catch(function (error) {
+            console.log('error na', error.data);
+        });
 
+    /*
     const apikey = '48F771427470A9CACFB27B8E09B99F2303F8031357C0525D129C5B6A25029185BF2E845CB07B2CF6EDF779E854088BFB'
     const email_subject = subject ? encodeURIComponent(subject) : encodeURIComponent('(no subject)');
     const encodedfromName = encodeURIComponent(fromName);
@@ -308,7 +320,7 @@ async function sendEmail(from, email, subject, template_id, fromName, merge_data
         axios(config)
             .then(function (response) {
                 if (response.data.success)
-                    resolve(response)
+                    resolve(response);
                 else
                     reject(response);
             })
@@ -316,7 +328,7 @@ async function sendEmail(from, email, subject, template_id, fromName, merge_data
                 reject(error);
             });
 
-    });
+    });*/
 
 }
 
