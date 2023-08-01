@@ -35,9 +35,9 @@ let verificationAttempts = 1;
                                 local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', JSON.stringify(response.data));
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
                                         }).catch(function (error) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', JSON.stringify(error.data));
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', error);
                                         });
                                     if (err) {
                                         console_log(`sendEmail[Error]: ${err.message}`);
@@ -48,9 +48,9 @@ let verificationAttempts = 1;
                                 local_connection.query(`update ftp_email set is_verified=1,triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', JSON.stringify(response.data));
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
                                         }).catch(function (error) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', JSON.stringify(error.data));
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', error);
                                         });
                                     if (err) {
                                         console_log(`sendEmail[Error]: ${err.message}`);
@@ -61,9 +61,9 @@ let verificationAttempts = 1;
                                 local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', JSON.stringify(response.data));
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
                                         }).catch(function (error) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', JSON.stringify(error.data));
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', error);
                                         });
                                     if (err) {
                                         console_log(`sendEmail[Error]: ${err.message}`);
@@ -74,7 +74,7 @@ let verificationAttempts = 1;
                                 await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                     .then(async function (response) {
                                         console_log(`Status : ${obj.token} Sent, ` + `Campaign : FreeToPlay Email`);
-                                        StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', JSON.stringify(response.data));
+                                        StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
                                         await emailVerification(obj.email)
                                             .then(function (response) {
                                                 console_log(`Email verified. Stopping the verification process.`);
@@ -97,8 +97,8 @@ let verificationAttempts = 1;
 
                                     }).catch(function (error) {
                                         //console.log(error);
-                                        console_log(`Status : ${obj.token} Failed, ` + `Campaign : FreeToPlay Email}`);
-                                        StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', JSON.stringify(error.data));
+                                        console_log(`Status : ${obj.token} Failed, ` + `Campaign : FreeToPlay Email`);
+                                        StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', error);
                                     }).finally(async function () {
                                         local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, (err, res) => {
                                             if (err) {
@@ -177,30 +177,30 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
                     case 1: //1st attempt
                         sendEmailResponse = await sendEmail(from, email, '2nd Day Email Verification', 'F2PLCHJP 2DVE', fromName, merge_data)
                             .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'success', JSON.stringify(response.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'success', response);
                                 return response;
                             }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'failed', JSON.stringify(error.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'failed', error);
                                 return error;
                             });
                         break;
                     case 2: //2nd attempt
                         sendEmailResponse = await sendEmail(from, email, '3rd Day Email Verification', 'F2PLCHJP 3DVE', fromName, merge_data)
                             .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', JSON.stringify(response.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', response);
                                 return response;
                             }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'failed', JSON.stringify(error.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'failed', error);
                                 return error;
                             });
                         break;
                     case 3: //3rd attempt
                         sendEmailResponse = await sendEmail(from, email, '4th Day Email Verification', 'F2PLCHJP 4DVE', fromName, merge_data)
                             .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', JSON.stringify(response.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', response);
                                 return response;
                             }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'failed', JSON.stringify(error.data));
+                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'failed', error);
                                 return error;
                             });
                         break;
@@ -272,21 +272,33 @@ async function emailCallback(transactionID) {
 
         axios.request(config)
             .then((response) => {
-                //console.log(JSON.stringify(response.data));
-                //console.log(JSON.stringify(response.data, null, 2));
-                if (response.data.data.deliveredcount > 0) {
-                    console.log('delivered');
-                    //console.log(JSON.stringify(response.data, null, 2));
-                    resolve(response.data);
+                if (response.data.data.deliveredcount !== 0) {
+                    const __json = new Object();
+                    __json.id = response.data.data.id;
+                    __json.status = 'Sent';
+                    __json.to = response.data.data.delivered;
+                    const apiResponse = JSON.stringify(__json);
+                    resolve(apiResponse);
+                } else if (response.data.data.failedcount !== 0) {
+                    const __json = new Object();
+                    __json.id = response.data.data.id;
+                    __json.status = 'Failed';
+                    __json.error_message = response.data.data.failed;
+                    const apiResponse = JSON.stringify(__json);
+                    reject(apiResponse);
+                } else if (response.data.data.pendingcount !== 0) {
+                    const __json = new Object();
+                    __json.id = response.data.data.id;
+                    __json.status = 'Throttled';
+                    __json.message = 'Waiting to retry';
+                    const apiResponse = JSON.stringify(__json);
+                    reject(apiResponse);
                 }
-                /*else{
-                    console.log(JSON.stringify(response.data, null, 2));
-                    console.log('not delivered');
-                }*/
             })
             .catch((error) => {
                 //console.log(error);
                 console.log(error);
+                reject(error);
             });
 
     });
@@ -323,16 +335,18 @@ async function sendEmail(from, email, subject, template_id, fromName, merge_data
                     resolve(response);
                 else
                     reject(response);*/
-                console.log(response.data.data.transactionid);
+                //console.log(response.data.data.transactionid);
 
                 setTimeout(async function () {
                     await emailCallback(response.data.data.transactionid)
                         .then(function (response) {
                             resolve(response);
+                            //console.log('Sent Successfully', response);
                         }).catch(function (error) {
-                            reject(response);
-                        });;
-                }, 2000);
+                            reject(error);
+                            //console.log('Sending Failed', error);
+                        });
+                }, 5000);
 
             })
             .catch(function (error) {
