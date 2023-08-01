@@ -258,14 +258,47 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
 
 }
 
+async function emailCallback(transactionID) {
+    const parse_transacID = String(transactionID);
 
+    const apikey = process.env.ELASTIC_API_KEY;
+    return new Promise(async (resolve, reject) => {
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `https://api.elasticemail.com/v2/email/getstatus?apikey=${apikey}&transactionID=${parse_transacID}&showFailed=true&showSent=true&showDelivered=true&showPending=true&showOpened=true&showClicked=true&showAbuse=true&showUnsubscribed=true&showErrors=true&showMessageIDs=true`,
+            headers: {}
+        };
+
+        axios.request(config)
+            .then((response) => {
+                //console.log(JSON.stringify(response.data));
+                //console.log(JSON.stringify(response.data, null, 2));
+                if (response.data.data.deliveredcount > 0) {
+                    console.log('delivered');
+                    //console.log(JSON.stringify(response.data, null, 2));
+                    resolve(response.data);
+                }
+                /*else{
+                    console.log(JSON.stringify(response.data, null, 2));
+                    console.log('not delivered');
+                }*/
+            })
+            .catch((error) => {
+                //console.log(error);
+                console.log(error);
+            });
+
+    });
+
+}
 
 
 
 async function sendEmail(from, email, subject, template_id, fromName, merge_data) {
 
 
-    const apikey = '48F771427470A9CACFB27B8E09B99F2303F8031357C0525D129C5B6A25029185BF2E845CB07B2CF6EDF779E854088BFB'
+    const apikey = process.env.ELASTIC_API_KEY;
     const email_subject = subject ? encodeURIComponent(subject) : encodeURIComponent('(no subject)');
     const encodedfromName = encodeURIComponent(fromName);
     var merge_params = "";
@@ -284,11 +317,23 @@ async function sendEmail(from, email, subject, template_id, fromName, merge_data
 
 
         axios(config)
-            .then(function (response) {
+            .then(async function (response) {
+                /*
                 if (response.data.success)
-                    resolve(response)
+                    resolve(response);
                 else
-                    reject(response);
+                    reject(response);*/
+                console.log(response.data.data.transactionid);
+
+                setTimeout(async function () {
+                    await emailCallback(response.data.data.transactionid)
+                        .then(function (response) {
+                            resolve(response);
+                        }).catch(function (error) {
+                            reject(response);
+                        });;
+                }, 2000);
+
             })
             .catch(function (error) {
                 reject(error);
