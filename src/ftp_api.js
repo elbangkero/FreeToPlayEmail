@@ -5,7 +5,7 @@ const https = require('https');
 var interval = 3000;
 
 const MAX_VERIFICATION_ATTEMPTS = 4;
-let VERIFICATION_INTERVAL = 12000;
+let VERIFICATION_INTERVAL = 10000;
 
 let verificationAttempts = 1;
 
@@ -35,7 +35,12 @@ let verificationAttempts = 1;
                                 local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+                                            const throttled = JSON.parse(response);
+                                            if (throttled.status == 'Throttled') {
+                                                StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'pending', response);
+                                            } else {
+                                                StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+                                            }
                                         }).catch(function (error) {
                                             StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', error);
                                         });
@@ -48,7 +53,12 @@ let verificationAttempts = 1;
                                 local_connection.query(`update ftp_email set is_verified=1,triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+                                            const throttled = JSON.parse(response);
+                                            if (throttled.status == 'Throttled') {
+                                                StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'pending', response);
+                                            } else {
+                                                StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+                                            }
                                         }).catch(function (error) {
                                             StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', error);
                                         });
@@ -61,7 +71,12 @@ let verificationAttempts = 1;
                                 local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
                                     sendEmailResponse = await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(function (response) {
-                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+                                            const throttled = JSON.parse(response);
+                                            if (throttled.status == 'Throttled') {
+                                                StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'pending', response);
+                                            } else {
+                                                StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+                                            }
                                         }).catch(function (error) {
                                             StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'failed', error);
                                         });
@@ -73,8 +88,14 @@ let verificationAttempts = 1;
                             } else {
                                 await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                     .then(async function (response) {
+                                        const throttled = JSON.parse(response);
+                                        if (throttled.status == 'Throttled') {
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'pending', response);
+                                        } else {
+                                            StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+                                        }
                                         console_log(`Status : ${obj.token} Sent, ` + `Campaign : FreeToPlay Email`);
-                                        StoreFTPEmailHistory(el.id, obj.name, obj.email, obj.token, obj.from, obj.fromName, obj.subject, obj.templateID, JSON.stringify(obj.merge), 'success', response);
+
                                         await emailVerification(obj.email)
                                             .then(function (response) {
                                                 console_log(`Email verified. Stopping the verification process.`);
@@ -88,7 +109,7 @@ let verificationAttempts = 1;
                                                 //console.log('ERROR:', JSON.stringify(error.data));
 
                                                 setTimeout(async () => {
-                                                    await sendEmailWithVerification(obj.from, obj.name, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data, el.id, obj.token, verificationAttempts);
+                                                    await sendEmailWithVerification(el.id, obj.from, obj.name, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data, el.id, obj.token, verificationAttempts);
                                                 }, VERIFICATION_INTERVAL);
                                             })
                                             .finally(async function () {
@@ -158,8 +179,9 @@ async function emailVerification(email) {
 
 
 
-async function sendEmailWithVerification(from, name, email, subject, template_id, fromName, merge_data, config_id, token, verificationAttempts) {
+async function sendEmailWithVerification(email_id, from, name, email, subject, template_id, fromName, merge_data, config_id, token, verificationAttempts) {
 
+    const transactionID = await getElasticEmailTransacID(email_id);
     await emailVerification(email)
         .then(async function (response) {
 
@@ -175,19 +197,43 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
                 let sendEmailResponse = '';
                 switch (verificationAttempts) {
                     case 1: //1st attempt
-                        sendEmailResponse = await sendEmail(from, email, '2nd Day Email Verification', 'F2PLCHJP 2DVE', fromName, merge_data)
-                            .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'success', response);
-                                return response;
-                            }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'failed', error);
-                                return error;
-                            });
+
+
+                        setTimeout(async function () {
+                            await elasticSendingCallback(transactionID)
+                                .then(async function (response_validated) {
+
+                                    const throttled = JSON.parse(response_validated);
+                                    if (throttled.status == 'Throttled') {
+                                        StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'pending', response_validated);
+                                    } else {
+                                        sendEmailResponse = await sendEmail(from, email, '2nd Day Email Verification', 'F2PLCHJP 2DVE', fromName, merge_data)
+                                            .then(function (response) {
+                                                verificationAttempts++;
+                                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'success', response);
+                                                return response;
+                                            }).catch(function (error) {
+                                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'failed', error);
+                                                return error;
+                                            });
+                                    }
+                                });
+
+                        }, 5000);
+
+
+
                         break;
                     case 2: //2nd attempt
                         sendEmailResponse = await sendEmail(from, email, '3rd Day Email Verification', 'F2PLCHJP 3DVE', fromName, merge_data)
                             .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', response);
+                                const throttled = JSON.parse(response);
+                                if (throttled.status == 'Throttled') {
+                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'pending', response);
+                                } else {
+                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', response);
+                                }
+                                verificationAttempts++;
                                 return response;
                             }).catch(function (error) {
                                 StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'failed', error);
@@ -197,7 +243,13 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
                     case 3: //3rd attempt
                         sendEmailResponse = await sendEmail(from, email, '4th Day Email Verification', 'F2PLCHJP 4DVE', fromName, merge_data)
                             .then(function (response) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', response);
+                                const throttled = JSON.parse(response);
+                                if (throttled.status == 'Throttled') {
+                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', response);
+                                } else {
+                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', response);
+                                }
+                                verificationAttempts++;
                                 return response;
                             }).catch(function (error) {
                                 StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'failed', error);
@@ -207,7 +259,7 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
                 }
                 const EmailResponse = sendEmailResponse.data == null ? false : sendEmailResponse.data.success;
                 //console.log(EmailResponse);
-                verificationAttempts++;
+
                 if (EmailResponse) {
                     console_log(`Status : ${token} Sent, ` + `Campaign : FreeToPlay Email`);
 
@@ -246,7 +298,7 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
                 }
                 await new Promise((resolve) => {
                     setTimeout(() => {
-                        resolve(sendEmailWithVerification(from, name, email, subject, template_id, fromName, merge_data, config_id, token, verificationAttempts));
+                        resolve(sendEmailWithVerification(email_id, from, name, email, subject, template_id, fromName, merge_data, config_id, token, verificationAttempts));
                     }, VERIFICATION_INTERVAL);
                 });
             } else {
@@ -258,7 +310,7 @@ async function sendEmailWithVerification(from, name, email, subject, template_id
 
 }
 
-async function emailCallback(transactionID) {
+async function elasticSendingCallback(transactionID) {
     const parse_transacID = String(transactionID);
 
     const apikey = process.env.ELASTIC_API_KEY;
@@ -292,7 +344,7 @@ async function emailCallback(transactionID) {
                     __json.status = 'Throttled';
                     __json.message = 'Waiting to retry';
                     const apiResponse = JSON.stringify(__json);
-                    reject(apiResponse);
+                    resolve(apiResponse);
                 }
             })
             .catch((error) => {
@@ -336,21 +388,28 @@ async function sendEmail(from, email, subject, template_id, fromName, merge_data
                 else
                     reject(response);*/
                 //console.log(response.data.data.transactionid);
+                console.log(response.data);
+                try {
+                    setTimeout(async function () {
+                        await elasticSendingCallback(response.data.data.transactionid)
+                            .then(function (response) {
+                                resolve(response);
+                                //console.log('Sent Successfully', response);
+                            }).catch(function (error) {
+                                reject(error);
+                                //console.log('Sending Failed', error);
+                            });
+                    }, 10000);
+                } catch (error) {
+                    console_log(error);
+                    console.log(error);
+                }
 
-                setTimeout(async function () {
-                    await emailCallback(response.data.data.transactionid)
-                        .then(function (response) {
-                            resolve(response);
-                            //console.log('Sent Successfully', response);
-                        }).catch(function (error) {
-                            reject(error);
-                            //console.log('Sending Failed', error);
-                        });
-                }, 5000);
 
             })
             .catch(function (error) {
                 reject(error);
+                console.log(error);
             });
 
     });
@@ -397,7 +456,14 @@ async function emailAttemptLock(email) {
     });
 }
 
+async function getElasticEmailTransacID(email_id) {
 
+    const query_transac = await local_connection.query(`select api_response  from ftp_email_history where email_id = '${email_id}' and template_id = 'F2PLCHJP VE';`);
+    const _json_parse = JSON.parse(JSON.stringify(query_transac.rows));
+    const _response = _json_parse[0].api_response;
+    const _trasac_id = JSON.parse(_response);
+    return _trasac_id.id;
+}
 
 const multerStorage = multer.diskStorage({
 
@@ -443,10 +509,6 @@ insertEmailRequest = async (_req, _res) => {
     });
 
 }
-
-
-
-
 
 
 module.exports = function (app) {
