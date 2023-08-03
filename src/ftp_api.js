@@ -366,7 +366,7 @@ async function elasticSendingCallback(transactionID) {
             })
             .catch((error) => {
                 //console.log(error);
-                console.log(error);
+                //console.log(error);
                 reject(error);
             });
 
@@ -419,14 +419,14 @@ async function sendEmail(from, email, subject, template_id, fromName, merge_data
                     }, 10000);
                 } catch (error) {
                     console_log(error);
-                    console.log(error);
+                    //console.log(error);
                 }
 
 
             })
             .catch(function (error) {
                 reject(error);
-                console.log(error);
+                //console.log(error);
             });
 
     });
