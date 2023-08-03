@@ -22,6 +22,7 @@ let verificationAttempts = 1;
 
                 console_log(`payload : ${dataload}`);
                 const callback = dataload == res.rowCount;
+                console.log(callback)
                 if (callback) {
                     data.forEach(function (el, index) {
 
@@ -181,7 +182,7 @@ async function emailVerification(email) {
 
 async function sendEmailWithVerification(email_id, from, name, email, subject, template_id, fromName, merge_data, config_id, token, verificationAttempts) {
 
-    const transactionID = await getElasticEmailTransacID(email_id);
+
     await emailVerification(email)
         .then(async function (response) {
 
@@ -198,64 +199,78 @@ async function sendEmailWithVerification(email_id, from, name, email, subject, t
                 switch (verificationAttempts) {
                     case 1: //1st attempt
 
+                        var transactionID = await getElasticEmailTransacID(email_id, 'F2PLCHJP VE');
+                        await elasticSendingCallback(transactionID)
+                            .then(async function (response_validated) {
 
-                        setTimeout(async function () {
-                            await elasticSendingCallback(transactionID)
-                                .then(async function (response_validated) {
-
-                                    const throttled = JSON.parse(response_validated);
-                                    if (throttled.status == 'Throttled') {
-                                        StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'pending', response_validated);
-                                    } else {
-                                        sendEmailResponse = await sendEmail(from, email, '2nd Day Email Verification', 'F2PLCHJP 2DVE', fromName, merge_data)
-                                            .then(function (response) {
-                                                verificationAttempts++;
-                                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'success', response);
-                                                return response;
-                                            }).catch(function (error) {
-                                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'failed', error);
-                                                return error;
-                                            });
-                                    }
-                                });
-
-                        }, 5000);
-
-
-
+                                const throttled = JSON.parse(response_validated);
+                                if (throttled.status == 'Throttled') {
+                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'pending', response_validated);
+                                    return response_validated;
+                                } else {
+                                    sendEmailResponse = await sendEmail(from, email, '2nd Day Email Verification', 'F2PLCHJP 2DVE', fromName, merge_data)
+                                        .then(function (response) {
+                                            StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'success', response);
+                                            verificationAttempts++;
+                                            return response;
+                                        }).catch(function (error) {
+                                            StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '2nd Day Email Verification', 'F2PLCHJP 2DVE', JSON.stringify(merge_data), 'failed', error);
+                                            return error;
+                                        });
+                                }
+                            });
                         break;
                     case 2: //2nd attempt
-                        sendEmailResponse = await sendEmail(from, email, '3rd Day Email Verification', 'F2PLCHJP 3DVE', fromName, merge_data)
-                            .then(function (response) {
-                                const throttled = JSON.parse(response);
+                        var transactionID = await getElasticEmailTransacID(email_id, 'F2PLCHJP 2DVE');
+                        await elasticSendingCallback(transactionID)
+                            .then(async function (response_validated) {
+                                const throttled = JSON.parse(response_validated);
                                 if (throttled.status == 'Throttled') {
-                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'pending', response);
+                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'pending', response_validated);
+                                    return response_validated;
                                 } else {
-                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', response);
+                                    sendEmailResponse = await sendEmail(from, email, '3rd Day Email Verification', 'F2PLCHJP 3DVE', fromName, merge_data)
+                                        .then(function (response) {
+                                            StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'success', response);
+                                            verificationAttempts++;
+                                            return response;
+                                        }).catch(function (error) {
+                                            StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'failed', error);
+                                            return error;
+                                        });
                                 }
-                                verificationAttempts++;
-                                return response;
-                            }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '3rd Day Email Verification', 'F2PLCHJP 3DVE', JSON.stringify(merge_data), 'failed', error);
-                                return error;
                             });
+
                         break;
+
+
                     case 3: //3rd attempt
-                        sendEmailResponse = await sendEmail(from, email, '4th Day Email Verification', 'F2PLCHJP 4DVE', fromName, merge_data)
-                            .then(function (response) {
-                                const throttled = JSON.parse(response);
+
+                        var transactionID = await getElasticEmailTransacID(email_id, 'F2PLCHJP 3DVE');
+                        await elasticSendingCallback(transactionID)
+                            .then(async function (response_validated) {
+                                const throttled = JSON.parse(response_validated);
                                 if (throttled.status == 'Throttled') {
-                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', response);
+                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'pending', response_validated);
+                                    return response_validated;
                                 } else {
-                                    StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', response);
+                                    sendEmailResponse = await sendEmail(from, email, '4th Day Email Verification', 'F2PLCHJP 4DVE', fromName, merge_data)
+                                        .then(function (response) {
+                                            StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'success', response);
+                                            verificationAttempts++;
+                                            return response;
+                                        }).catch(function (error) {
+                                            StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'failed', error);
+                                            return error;
+                                        });
                                 }
-                                verificationAttempts++;
-                                return response;
-                            }).catch(function (error) {
-                                StoreFTPEmailHistory(config_id, name, email, token, from, fromName, '4th Day Email Verification', 'F2PLCHJP 4DVE', JSON.stringify(merge_data), 'failed', error);
-                                return error;
                             });
+
                         break;
+
+
+
+
                 }
                 const EmailResponse = sendEmailResponse.data == null ? false : sendEmailResponse.data.success;
                 //console.log(EmailResponse);
@@ -388,7 +403,7 @@ async function sendEmail(from, email, subject, template_id, fromName, merge_data
                 else
                     reject(response);*/
                 //console.log(response.data.data.transactionid);
-                console.log(response.data);
+                //console.log(response.data);
                 try {
                     setTimeout(async function () {
                         await elasticSendingCallback(response.data.data.transactionid)
@@ -456,9 +471,9 @@ async function emailAttemptLock(email) {
     });
 }
 
-async function getElasticEmailTransacID(email_id) {
+async function getElasticEmailTransacID(email_id, template_id) {
 
-    const query_transac = await local_connection.query(`select api_response  from ftp_email_history where email_id = '${email_id}' and template_id = 'F2PLCHJP VE';`);
+    const query_transac = await local_connection.query(`select api_response  from ftp_email_history where email_id = '${email_id}' and template_id = '${template_id}';`);
     const _json_parse = JSON.parse(JSON.stringify(query_transac.rows));
     const _response = _json_parse[0].api_response;
     const _trasac_id = JSON.parse(_response);
