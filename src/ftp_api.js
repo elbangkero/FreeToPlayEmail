@@ -29,7 +29,7 @@ let verificationAttempts = 1;
                             const utf8encoded = (new Buffer.from(el.payload, 'base64')).toString('utf8');
                             //console.log(utf8encoded);
                             const obj = JSON.parse(utf8encoded);
-
+                            //this is commit
                             const merge_data = obj.merge ? obj.merge : '';
                             if (merge_data.merge_type == 'f2p_lock_email') {
                                 local_connection.query(`update ftp_email set triggerstatus= 'inactive' , status = 'sent' where id=${el.id}`, async (err, res) => {
