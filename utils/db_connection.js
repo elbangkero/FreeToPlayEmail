@@ -11,6 +11,7 @@ const joystick_connection = new Pool
         password: `${process.env.JOYSTICK_PASSWORD}`,
         port: `${process.env.JOYSTICK_DB_PORT}`,
         ssl: true,
+        idle_in_transaction_session_timeout: 0
     });
 
 const local_connection = new Pool
@@ -20,6 +21,7 @@ const local_connection = new Pool
         database: `${process.env.LOCAL_DATABASE}`,
         password: `${process.env.LOCAL_PASSWORD}`,
         port: `${process.env.LOCAL_DB_PORT}`,
+        idle_in_transaction_session_timeout: 0
     });
 
 
@@ -47,12 +49,12 @@ function local_client() {
 
 
 joystick_connection.on('error', (err) => {
-    console_log('Free To Play : Joystick Database error',err);
+    console_log('Free To Play : Joystick Database error', err);
     setTimeout(joystick_client, 60000);
 });
 
 local_connection.on('error', (err) => {
-    console_log('Free To Play : Local connection error',err);
+    console_log('Free To Play : Local connection error', err);
     setTimeout(local_client, 60000);
 });
 
@@ -65,4 +67,4 @@ local_client();
 
 
 
-module.exports = { joystick_connection, local_connection,joystick_client};
+module.exports = { joystick_connection, local_connection, joystick_client };
