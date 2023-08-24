@@ -87,7 +87,7 @@ let verificationAttempts = 1;
                                 console_log('Password Reset');
                             } else {
 
-                                local_connection.query(`update ftp_email set is_verified=1,triggerstatus='inactive', status='sent' where id=${el.id}`, async (err, res) => {
+                                local_connection.query(`update ftp_email set triggerstatus='inactive', status='sent' where id=${el.id}`, async (err, res) => {
                                     await sendEmail(obj.from, obj.email, obj.subject, obj.templateID, obj.fromName, merge_data)
                                         .then(async function (response) {
                                             const throttled = JSON.parse(response);
