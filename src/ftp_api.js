@@ -11,8 +11,10 @@ let verificationAttempts = 1;
 
 (async () => {
     const client = await local_connection.connect();
+    local_connection.on('error', (err) => {
+        console_log('Local connection error', err); 
+    });
     await client.query('LISTEN ftp_listener');
-    client.on('error', console.error);
     client.on('notification', function (data) {
         getConfig(parseInt(data.payload));
         //console.log("data", JSON.parse(data.payload));
