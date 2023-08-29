@@ -142,7 +142,7 @@ let verificationAttempts = 1;
 
 
     });
-
+    client.on('error', console.error);
 
 })();
 
