@@ -12,6 +12,9 @@ let verificationAttempts = 1;
 
 (async () => {
     const client = await local_connection.connect();
+    client.on('error', (err) => {
+        console_log('Free To Plays : Local connection error', err);
+    });
     await client.query('LISTEN ftp_listener');
     client.on('notification', function (data) {
         getConfig(parseInt(data.payload));
@@ -143,14 +146,11 @@ let verificationAttempts = 1;
 
 
     });
-    local_connection.on('error', (err) => {
-        console_log('Free To Play : Local connection error', err);
-    });
 })();
 
 
 local_connection.on('error', (err) => {
-    console_log('Free To Play : Local connection error', err);
+    console_log('Free To Playssss : Local connection error', err);
 });
 
 
