@@ -10,9 +10,10 @@ let VERIFICATION_INTERVAL = 86400000;
 let verificationAttempts = 1;
 
 
-(async () => { 
-    local_connection.query('LISTEN ftp_listener');
-    local_connection.on('notification', function (data) {
+(async () => {
+    const client = await local_connection.connect();
+    await client.query('LISTEN ftp_listener');
+    client.on('notification', function (data) {
         getConfig(parseInt(data.payload));
         //console.log("data", JSON.parse(data.payload));
         function getConfig(dataload) {
@@ -139,7 +140,10 @@ let verificationAttempts = 1;
 
             })
         }
+
+
     });
+
 })();
 
 
