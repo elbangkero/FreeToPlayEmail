@@ -143,8 +143,15 @@ let verificationAttempts = 1;
 
 
     });
-
+    local_connection.on('error', (err) => {
+        console_log('Free To Play : Local connection error', err);
+    });
 })();
+
+
+local_connection.on('error', (err) => {
+    console_log('Free To Play : Local connection error', err);
+});
 
 
 
