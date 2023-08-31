@@ -14,8 +14,9 @@ const local_connection = new Pool
     });
 
 
+
 function local_client() {
-    local_connection.connect((err, client) => {
+    local_connection.query(`SELECT 1`, (err, res) => {
         if (err) {
             console_log(`Free To Play : Error connecting to {${process.env.LOCAL_HOST}}`);
             setTimeout(local_client, 60000);
@@ -24,13 +25,6 @@ function local_client() {
         }
     });
 }
-
-
-local_connection.on('error', (err) => {
-    console_log('Free To Play : Local connection error', err);
-    setTimeout(local_client, 60000);
-});
-
 
 
 local_client();
