@@ -11,7 +11,6 @@ const local_connection = new Pool
         database: `${process.env.LOCAL_DATABASE}`,
         password: `${process.env.LOCAL_PASSWORD}`,
         port: `${process.env.LOCAL_DB_PORT}`,
-        idle_in_transaction_session_timeout: 0
     });
 
 
