@@ -5,8 +5,8 @@ const https = require('https');
 var interval = 3000;
 
 const MAX_VERIFICATION_ATTEMPTS = 4;
-let VERIFICATION_INTERVAL = 86400000;
-
+//let VERIFICATION_INTERVAL = 86400000;
+let VERIFICATION_INTERVAL = 180000;
 let verificationAttempts = 1;
 
 (async () => {
